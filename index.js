@@ -65,7 +65,7 @@ setInterval(() => {
       console.error("🚨 Eroare la schimbarea culorii:", error.message || error);
     }
   })();
-}, 9000); // 9 secunde pentru a evita rate limit
+}, 30000); // 30 secunde pentru a evita rate limit
 
 
 // 🔐 Tokenul vine tot din Railway
@@ -103,3 +103,7 @@ process.on('uncaughtException', (err) => {
   console.error('💥 Excepție neașteptată:', err);
   process.exit(1); // Forcează închiderea
 });
+
+if (role.color !== newColor) {
+  await role.setColor(newColor);
+}
