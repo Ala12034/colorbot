@@ -22,22 +22,55 @@ client.once('ready', async () => {
   }
 
   let i = 0;
-  setInterval(async () => {
-    try {
-      const guild = await client.guilds.fetch(GUILD_ID);
-      const role = await guild.roles.fetch(ROLE_ID);
+  setInterval(() => {
+    (async () => {
+      try {
+        const guild = await client.guilds.fetch(GUILD_ID);
+        const role = await guild.roles.fetch(ROLE_ID);
 
-      if (role) {
+        if (!role) {
+          console.log("❌ Rolul nu a fost găsit.");
+          return;
+        }
+
         const newColor = colors[i % colors.length];
         await role.setColor(newColor);
         console.log(`🎨 Culoare schimbată: #${newColor.toString(16)}`);
         i++;
+      } catch (error) {
+        console.error("❌ Eroare la schimbarea culorii:", error);
       }
+    })(); // ← închidem funcția async
+  }, 10000); // ← intervalul
+}); // ← închidem client.once
+
+
+let i = 0;
+
+setInterval(() => {
+  (async () => {
+    try {
+      const guild = await client.guilds.fetch(GUILD_ID);
+      const role = await guild.roles.fetch(ROLE_ID);
+
+      if (!role) {
+        console.log("❌ Rolul nu a fost găsit.");
+        return;
+      }
+
+      const newColor = colors[i % colors.length];
+      console.log(`🎨 Încerc să schimb culoarea în: #${newColor.toString(16)}`);
+
+      await role.setColor(newColor);
+      console.log(`✅ Culoarea a fost schimbată: #${newColor.toString(16)}`);
+
+      i++;
     } catch (error) {
-      console.error('❌ Eroare la schimbarea culorii:', error);
+      console.error("🚨 Eroare la schimbarea culorii:", error.message || error);
     }
-  }, 10000); // schimbă la fiecare 10 secunde
-});
+  })();
+}, 15000); // 15 secunde pentru a evita rate limit
+
 
 // 🔐 Tokenul vine tot din Railway
 client.login(process.env.TOKEN);
