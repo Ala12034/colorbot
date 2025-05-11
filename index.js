@@ -65,7 +65,7 @@ setInterval(() => {
       console.error("🚨 Eroare la schimbarea culorii:", error.message || error);
     }
   })();
-}, 8000); // 8 secunde pentru a evita rate limit
+}, 9000); // 9 secunde pentru a evita rate limit
 
 
 // 🔐 Tokenul vine tot din Railway
