@@ -1,95 +1,54 @@
+// index.js
 const { Client, GatewayIntentBits } = require('discord.js');
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers
-  ]
-});
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-const GUILD_ID = process.env.GUILD_ID;
-
-// Liste de roluri țintă și colorate
-const TARGET_ROLE_IDS = process.env.TARGET_ROLE_IDS.split(","); // ex: "123,456,789"
-const COLOR_ROLES = [
-  process.env.ROLE_ID_1,
-  process.env.ROLE_ID_2,
-  process.env.ROLE_ID_3,
-  process.env.ROLE_ID_4,
-  process.env.ROLE_ID_5,
-  process.env.ROLE_ID_6,
-  process.env.ROLE_ID_7,
-  process.env.ROLE_ID_8,
-  process.env.ROLE_ID_9,
-  process.env.ROLE_ID_11,
-  process.env.ROLE_ID_12,
-  process.env.ROLE_ID_13,
-  process.env.ROLE_ID_14,
-  process.env.ROLE_ID_15,
-  process.env.ROLE_ID_16,
-  process.env.ROLE_ID_17,
-  process.env.ROLE_ID_18,
-  process.env.ROLE_ID_19,
-  process.env.ROLE_ID_20,
-  process.env.ROLE_ID_21,
-  process.env.ROLE_ID_22,
+const ROLE_IDS = [
+  "ROLE_ID_1", "ROLE_ID_2", "ROLE_ID_3", "ROLE_ID_4", "ROLE_ID_5",
+  "ROLE_ID_6", "ROLE_ID_7", "ROLE_ID_8", "ROLE_ID_9", "ROLE_ID_10",
+  "ROLE_ID_11", "ROLE_ID_12", "ROLE_ID_13", "ROLE_ID_14", "ROLE_ID_15",
+  "ROLE_ID_16", "ROLE_ID_17", "ROLE_ID_18", "ROLE_ID_19", "ROLE_ID_20",
+  "ROLE_ID_21", "ROLE_ID_22"
 ];
+
+const TARGET_ROLE = process.env.ROLE_ID;
+const GUILD_ID = process.env.GUILD_ID;
+const CHANNEL_ID = process.env.CHANNEL_ID;
 
 client.once('ready', async () => {
   console.log(`✅ Botul este online ca ${client.user.tag}`);
 
-  let colorIndex = 0;
+  try {
+    const channel = await client.channels.fetch(CHANNEL_ID);
+    if (channel && channel.isTextBased()) {
+      await channel.send("✅ Botul este online și pregătit să coloreze!");
+    }
+  } catch (error) {
+    console.error("❌ Eroare la trimiterea mesajului de pornire:", error);
+  }
 
+  let index = 0;
   setInterval(async () => {
     try {
       const guild = await client.guilds.fetch(GUILD_ID);
-      await guild.members.fetch(); // încarcă toți membrii
+      const members = await guild.members.fetch();
 
-      guild.members.cache.forEach(async (member) => {
-        // Verifică dacă membrul are cel puțin un rol țintă
-        const hasTargetRole = TARGET_ROLE_IDS.some(rid => member.roles.cache.has(rid));
+      const colorRoleId = ROLE_IDS[index % ROLE_IDS.length];
+      index++;
 
-        // Scoate toate culorile de pe membru
-        for (const colorRole of COLOR_ROLES) {
-          if (member.roles.cache.has(colorRole)) {
-            await member.roles.remove(colorRole).catch(() => {});
-          }
-        }
-
-        // Dacă are un rol țintă, adaugă următoarea culoare
-        if (hasTargetRole) {
-          const nextColor = COLOR_ROLES[colorIndex % COLOR_ROLES.length];
-          await member.roles.add(nextColor).catch(() => {});
+      members.forEach(async (member) => {
+        if (member.roles.cache.has(TARGET_ROLE)) {
+          // Sterge toate rolurile de culoare existente
+          const currentColorRoles = ROLE_IDS.filter(rid => member.roles.cache.has(rid));
+          await member.roles.remove(currentColorRoles);
+          await member.roles.add(colorRoleId);
+          console.log(`🎨 ${member.user.tag} a primit culoarea ${colorRoleId}`);
         }
       });
 
-      console.log(`🎨 Culoare rotită: ${colorIndex + 1}`);
-      colorIndex++;
-    } catch (err) {
-      console.error("❌ Eroare în rotația pe mai multe roluri:", err.message);
+    } catch (error) {
+      console.error("❌ Eroare la schimbarea culorilor:", error);
     }
-  }, 60000); // 60 secunde
+  }, 10000); // la fiecare 10 secunde
 });
 
 client.login(process.env.TOKEN);
-
-try {
-  const channel = await client.channels.fetch(process.env.CHANNEL_ID);
-  if (channel && channel.isTextBased()) {
-    await channel.send("✅│🤖 Botul este online și pregătit să coloreze!");
-  }
-} catch (err) {
-  console.error("❌ Nu pot trimite mesaj de pornire:", err.message);
-}
-
-process.on('uncaughtException', async (err) => {
-  console.error("💥 Eroare neașteptată:", err.message);
-
-  try {
-    const channel = await client.channels.fetch(process.env.CHANNEL_ID);
-    if (channel && channel.isTextBased()) {
-      await channel.send(`❌│A apărut o eroare: \`${err.message}\``);
-    }
-  } catch (e) {
-    console.error("⚠️ Nu pot trimite eroarea în canal:", e.message);
-  }
-});
