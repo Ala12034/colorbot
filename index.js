@@ -42,4 +42,20 @@ client.once('ready', async () => {
 // 🔐 Tokenul vine tot din Railway
 client.login(process.env.TOKEN);
 
+client.on('messageCreate', async (message) => {
+  if (message.content === '!culoare') {
+    try {
+      const guild = await client.guilds.fetch(GUILD_ID);
+      const role = await guild.roles.fetch(ROLE_ID);
+      if (role) {
+        const newColor = colors[Math.floor(Math.random() * colors.length)];
+        await role.setColor(newColor);
+        message.channel.send(`🎨 Rolul a fost colorat cu: #${newColor.toString(16)}`);
+      }
+    } catch (err) {
+      console.error('❌ Eroare la comanda !culoare:', err);
+      message.channel.send('⚠️ Nu am putut schimba culoarea.');
+    }
+  }
+});
 
