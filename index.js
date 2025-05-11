@@ -96,14 +96,3 @@ async function startBot() {
     setTimeout(startBot, 5000); // încearcă din nou după 5 secunde
   }
 }
-
-startBot(); // În loc de client.login()
-
-process.on('uncaughtException', (err) => {
-  console.error('💥 Excepție neașteptată:', err);
-  process.exit(1); // Forcează închiderea
-});
-
-if (role.color !== newColor) {
-  await role.setColor(newColor);
-}
