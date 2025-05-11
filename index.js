@@ -64,3 +64,16 @@ client.once('ready', async () => {
 });
 
 client.login(process.env.TOKEN);
+
+members.forEach(async (member) => {
+  if (member.roles.cache.has(TARGET_ROLE)) {
+    const currentColorRoles = ROLE_IDS.filter(rid => member.roles.cache.has(rid));
+    
+    console.log(`🔁 Încerc să schimb culoarea pentru ${member.user.tag}`);
+    
+    await member.roles.remove(currentColorRoles);
+    await member.roles.add(colorRoleId);
+    
+    console.log(`🎨 ${member.user.tag} a primit culoarea ${colorRoleId}`);
+  }
+});
