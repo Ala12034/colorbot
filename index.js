@@ -7,46 +7,38 @@ const colors = [
   0x7400b8, 0x3a0ca3, 0x80b918
 ];
 
-// ✅ AICI folosim variabilele de mediu (din Railway)
 const GUILD_ID = process.env.GUILD_ID;
 const ROLE_ID = process.env.ROLE_ID;
 const CHANNEL_ID = process.env.CHANNEL_ID;
 
 client.once('ready', async () => {
-  console.log(`✅ Botul este online ca ${client.user.tag}! 🔥`);
+  console.log(`✅ Botul este online ca ${client.user.tag}!`);
 
-  // 🔔 Trimite mesaj în canal când pornește
   const channel = await client.channels.fetch(CHANNEL_ID);
   if (channel && channel.isTextBased()) {
     channel.send('✅│🤖 Botul e online și pregătit să coloreze!');
   }
 
   let i = 0;
-  setInterval(() => {
-    (async () => {
-      try {
-        const guild = await client.guilds.fetch(GUILD_ID);
-        const role = await guild.roles.fetch(ROLE_ID);
-
-        if (!role) {
-          console.log("❌ Rolul nu a fost găsit.");
-          return;
-        }
-
-        const newColor = colors[i % colors.length];
-        await role.setColor(newColor);
-        console.log(`🎨 Culoare schimbată: #${newColor.toString(16)}`);
-        i++;
-      } catch (error) {
-        console.error("❌ Eroare la schimbarea culorii:", error);
+  setInterval(async () => {
+    try {
+      const guild = await client.guilds.fetch(GUILD_ID);
+      const role = await guild.roles.fetch(ROLE_ID);
+      if (!role) {
+        console.log("❌ Rolul nu a fost găsit.");
+        return;
       }
-    })();
-  }, 10000); // ↻ la fiecare 10 secunde
+      const newColor = colors[i % colors.length];
+      await role.setColor(newColor);
+      console.log(`🎨 Culoare schimbată: #${newColor.toString(16)}`);
+      i++;
+    } catch (error) {
+      console.error("❌ Eroare la schimbarea culorii:", error);
+    }
+  }, 10000); // la fiecare 10 secunde
 });
 
-// 🔐 Tokenul vine din Railway
 client.login(process.env.TOKEN);
-
 
 
 let i = 0;
@@ -73,7 +65,7 @@ setInterval(() => {
       console.error("🚨 Eroare la schimbarea culorii:", error.message || error);
     }
   })();
-}, 15000); // 15 secunde pentru a evita rate limit
+}, 8000); // 8 secunde pentru a evita rate limit
 
 
 // 🔐 Tokenul vine tot din Railway
@@ -96,3 +88,18 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+async function startBot() {
+  try {
+    await client.login(process.env.TOKEN);
+  } catch (err) {
+    console.error('❌ Eroare la login, încerc din nou în 5 secunde:', err.message);
+    setTimeout(startBot, 5000); // încearcă din nou după 5 secunde
+  }
+}
+
+startBot(); // În loc de client.login()
+
+process.on('uncaughtException', (err) => {
+  console.error('💥 Excepție neașteptată:', err);
+  process.exit(1); // Forcează închiderea
+});
