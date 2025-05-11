@@ -7,7 +7,7 @@ const colors = [
   0x7400b8, 0x3a0ca3, 0x80b918
 ];
 
-// 🔽 AICI folosim variabilele de mediu (din Railway)
+// ✅ AICI folosim variabilele de mediu (din Railway)
 const GUILD_ID = process.env.GUILD_ID;
 const ROLE_ID = process.env.ROLE_ID;
 const CHANNEL_ID = process.env.CHANNEL_ID;
@@ -40,9 +40,13 @@ client.once('ready', async () => {
       } catch (error) {
         console.error("❌ Eroare la schimbarea culorii:", error);
       }
-    })(); // ← închidem funcția async
-  }, 10000); // ← intervalul
-}); // ← închidem client.once
+    })();
+  }, 10000); // ↻ la fiecare 10 secunde
+});
+
+// 🔐 Tokenul vine din Railway
+client.login(process.env.TOKEN);
+
 
 
 let i = 0;
