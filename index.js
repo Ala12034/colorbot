@@ -1,26 +1,15 @@
-// index.js
 const { Client, GatewayIntentBits } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const ROLE_IDS = [
-  "135162160767942763",
-  "1351621740087998149",
-  "1351622064115470914",
-  "1351620640335345166",
-  "1351620697911487352",
-  "1351621358210974419",
-  "1351621118809696535",
-  "1351620406755953352",
-  "135162074087219776",
-  "1351621007793213331",
-  "135162135986698284",
-  "1351620480696994121",
-  "1351620632113061133",
-  "1351620535843833115",
-  "1351620889446603804",
-  "130934046675157799"
+  "135162160767942763", "135162170087998149", "13516211454709514",
+  "135162064335451616", "135162079114878352", "135185662821997419",
+  "135211188096955", "13516206755953535", "1351620748721976",
+  "135185807309213331", "13518593586699824", "1351840669970554",
+  "1351620631135", "135185843483315", "13529844660304",
+  "13520067757157799", "13529844660444", "13520067757151111",
+  "13529844660888", "13520067757152222", "13529844660666", "13520067757153333"
 ];
-
 
 const TARGET_ROLE = process.env.ROLE_ID;
 const GUILD_ID = process.env.GUILD_ID;
@@ -49,7 +38,6 @@ client.once('ready', async () => {
 
       members.forEach(async (member) => {
         if (member.roles.cache.has(TARGET_ROLE)) {
-          // Sterge toate rolurile de culoare existente
           const currentColorRoles = ROLE_IDS.filter(rid => member.roles.cache.has(rid));
           await member.roles.remove(currentColorRoles);
           await member.roles.add(colorRoleId);
@@ -60,20 +48,7 @@ client.once('ready', async () => {
     } catch (error) {
       console.error("❌ Eroare la schimbarea culorilor:", error);
     }
-  }, 10000); // la fiecare 10 secunde
+  }, 10000); // schimbă la fiecare 10 secunde
 });
 
 client.login(process.env.TOKEN);
-
-members.forEach(async (member) => {
-  if (member.roles.cache.has(TARGET_ROLE)) {
-    const currentColorRoles = ROLE_IDS.filter(rid => member.roles.cache.has(rid));
-    
-    console.log(`🔁 Încerc să schimb culoarea pentru ${member.user.tag}`);
-    
-    await member.roles.remove(currentColorRoles);
-    await member.roles.add(colorRoleId);
-    
-    console.log(`🎨 ${member.user.tag} a primit culoarea ${colorRoleId}`);
-  }
-});
